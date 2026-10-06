@@ -1,0 +1,235 @@
+/* Base e Reset */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+:root {
+    --color-primary: #0d6efd;
+    --color-secondary: #0c9f0c;
+    --color-bg: #f5f7fa;
+    --color-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+* {
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+    border-radius: 8px; /* Cantos arredondados em tudo */
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: var(--color-bg);
+}
+
+#app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* Barra de Pesquisa e Controles */
+#search-bar {
+    background: white;
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.shadow-md {
+    box-shadow: var(--color-shadow);
+}
+
+.input-group {
+    border: 1px solid #ccc;
+    padding: 10px;
+    flex: 1 1 300px; /* Flexível para responsividade */
+    min-width: 250px;
+}
+
+.input-group legend {
+    font-weight: 600;
+    color: var(--color-primary);
+    padding: 0 5px;
+}
+
+.linha-inputs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center; /* Garante alinhamento vertical */
+}
+
+input {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    transition: border-color 0.2s;
+    min-width: 100px;
+}
+
+input:focus {
+    border-color: var(--color-primary);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25);
+}
+
+button {
+    padding: 8px 15px;
+    cursor: pointer;
+    font-weight: 600;
+    border: none;
+    transition: background-color 0.2s, transform 0.1s;
+    white-space: nowrap;
+}
+
+.btn-primary {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background-color: var(--color-secondary);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #097d09;
+    transform: translateY(-1px);
+}
+
+/* Estilo específico da Sonda (Ajustado para exibir corretamente Lat/Lng) */
+.sonda-group {
+    display: flex;
+    flex-direction: column;
+}
+.sonda-controls {
+    margin-bottom: 10px;
+}
+
+.info-sonda {
+    font-size: 14px;
+    /* Correção: Garante que a linha de Lat/Lng use todo o espaço e controle o wrap */
+    display: flex;
+    gap: 4px; /* Espaço entre Lat e Lng */
+    flex-wrap: wrap;
+}
+
+.info-sonda .label {
+    font-weight: 600;
+    color: #4b5563;
+    flex-shrink: 0;
+}
+/* Garante que Lat/Lng ocupe cerca de 50% cada, permitindo que a longitude apareça */
+#sondaLat, #sondaLng {
+    flex: 1 1 35%; 
+    min-width: 100px;
+    font-weight: 700;
+    color: var(--color-primary);
+    overflow: hidden; 
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* Container do Mapa */
+#map {
+    flex-grow: 1; /* Ocupa o restante do espaço vertical */
+    min-height: 300px;
+    z-index: 1; /* Garante que o painel de info fique acima */
+}
+
+/* Painel de Informações e Legenda */
+#info-panel {
+    position: absolute;
+    /* Posição alterada para inferior esquerdo (bottom e left) */
+    bottom: 10px;
+    left: 10px;
+    top: auto; /* Remove a posição superior */
+    right: auto; /* Remove a posição direita */
+    /* Fim das alterações de posição */
+    background: white;
+    padding: 15px;
+    max-width: 300px;
+    z-index: 1000; /* Acima do mapa */
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+#info-panel strong {
+    font-size: 16px;
+    color: var(--color-primary);
+}
+
+#posto-info {
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+    font-size: 13px;
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    border-radius: 50%; /* Bolinhas para os raios */
+}
+
+/* Cores dos Raios */
+.legend-color.api { background: #3f83f8; } /* Azul */
+.legend-color.entrada { background: #f87171; } /* Vermelho */
+.legend-color.saida { background: #facc15; } /* Amarelo */
+.legend-color.sonda { background: #8A2BE2; } /* Roxo para o Raio Sonda Fixo */
+
+/* Estilo para o marcador Sonda (personalizado para ser mais visível) */
+.sonda-marker {
+    background-color: #ff00ff; /* Cor magenta vibrante */
+    border: 3px solid white;
+    border-radius: 50%;
+    width: 15px;
+    height: 15px;
+    display: block;
+    box-shadow: 0 0 5px #ff00ff;
+}
+
+/* Media Query para Responsividade em Telas Menores */
+@media (max-width: 768px) {
+    #search-bar {
+        flex-direction: column;
+    }
+    .input-group {
+        flex-basis: 100%;
+        margin-bottom: 10px;
+    }
+    #info-panel {
+        top: auto;
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+        max-width: none;
+        padding: 10px;
+    }
+    /* Ajuste fino para garantir que Lat/Lng da Sonda fiquem visíveis no celular */
+    .info-sonda {
+        display: grid;
+        grid-template-columns: auto 1fr auto 1fr;
+        gap: 4px 8px;
+    }
+    .info-sonda .label {
+        white-space: nowrap;
+    }
+}
