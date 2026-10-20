@@ -1,75 +1,85 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa de Raio - GIST, Validadores e Sonda</title>
-    <!-- Carregamento do Leaflet -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"/>
-    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Carregamento do nosso CSS -->
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b3558">
+  <title>Pontos GIST | ETUFOR</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <link rel="stylesheet" href="./styles.css?v=3">
 </head>
 <body>
-    <div id="app-container">
-        <!-- BARRA DE PESQUISA E CONTROLES (GIST/VALIDADORES) -->
-        <div id="search-bar" class="shadow-md">
-            <!-- Camada GIST (Posto) -->
-            <fieldset class="input-group">
-                <legend>1. GIST - Buscar Posto</legend>
-                <div class="linha-inputs">
-                    <input id="postoInput" type="number" placeholder="Nº Posto">
-                    <input id="raioEntrada" type="number" placeholder="Raio Entrada (m)" value="100">
-                    <input id="raioSaida" type="number" placeholder="Raio Saída (m)" value="200">
-                    <button id="btnBuscarPosto" class="btn-primary">Buscar GIST</button>
-                </div>
-            </fieldset>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">G</div>
+        <div><h1>Pontos GIST</h1><p>Consulta de postos de controle · ETUFOR</p></div>
+      </div>
+      <div id="status" class="status" role="status" aria-live="polite">Carregando mapa...</div>
+    </header>
 
-            <!-- Camada Validadores (Manual) -->
-            <fieldset class="input-group">
-                <legend>2. Validadores - Coordenadas Manuais</legend>
-                <div class="linha-inputs">
-                    <input id="latInput" type="number" step="0.000001" placeholder="Latitude manual">
-                    <input id="lngInput" type="number" step="0.000001" placeholder="Longitude manual">
-                    <button id="btnUsarLatLng" class="btn-secondary">Desenhar Validadores</button>
-                </div>
-            </fieldset>
-
-            <!-- Camada Sonda (Mouse) -->
-            <fieldset class="input-group sonda-group">
-                <legend>3. Sonda - Controle por Mouse</legend>
-                <div class="linha-inputs sonda-controls">
-                    <input id="raioSonda" type="number" placeholder="Raio Sonda (m)" value="50">
-                    <button id="toggleSonda" class="btn-primary">Ativar/Desativar Sonda</button>
-                </div>
-                <div class="linha-inputs info-sonda">
-                    <span class="label">Lat:</span> <span id="sondaLat" class="value">Desativada</span>
-                    <span class="label">Lng:</span> <span id="sondaLng" class="value">Desativada</span>
-                </div>
-            </fieldset>
+    <main class="workspace">
+      <section class="control-card" aria-labelledby="titulo-busca">
+        <div class="card-heading"><span class="step-number">1</span><div><h2 id="titulo-busca">GIST — Buscar posto</h2><p>Consulte o posto pelo número cadastrado.</p></div></div>
+        <label for="postoInput">Número do posto de controle</label>
+        <div class="inline-controls search-controls">
+          <input id="postoInput" type="number" min="1" step="1" inputmode="numeric" placeholder="Ex.: 100" autocomplete="off">
+          <button id="btnBuscarPosto" class="button button-primary" type="button">Buscar GIST</button>
         </div>
-
-        <!-- CONTAINER DO MAPA -->
-        <div id="map"></div>
-
-        <!-- PAINEL DE INFORMAÇÕES/LEGENDA -->
-        <div id="info-panel" class="shadow-md">
-            <strong>Legenda de Raios:</strong>
-            <div class="legend">
-                <div class="legend-item"><div class="legend-color api"></div>Raio API GIST (Azul)</div>
-                <div class="legend-item"><div class="legend-color entrada"></div>Raio Entrada (Vermelho)</div>
-                <div class="legend-item"><div class="legend-color saida"></div>Raio Saída (Amarelo)</div>
-                <div class="legend-item"><div class="legend-color sonda"></div>Raio Sonda (Roxo - Fixo)</div>
-            </div>
-            <hr>
-            <div id="posto-info">
-                <div class="info-line"><strong id="nomePosto">Posto/Coordenada</strong></div>
-                <div id="raioPosto">API: 0m | Entrada: 0m | Saída: 0m</div>
-            </div>
+        <div class="field-grid">
+          <div><label for="raioEntrada">Raio de entrada (m)</label><input id="raioEntrada" type="number" min="0" step="1" value="100"></div>
+          <div><label for="raioSaida">Raio de saída (m)</label><input id="raioSaida" type="number" min="0" step="1" value="200"></div>
         </div>
-    </div>
+      </section>
 
-    <!-- Carregamento do nosso JS (async para não bloquear o carregamento) -->
-    <script src="script.js" defer></script>
+      <section class="control-card" aria-labelledby="titulo-validador">
+        <div class="card-heading"><span class="step-number step-green">2</span><div><h2 id="titulo-validador">Validadores — Coordenadas manuais</h2><p>Informe latitude e longitude para marcar outro ponto.</p></div></div>
+        <div class="field-grid">
+          <div><label for="latInput">Latitude</label><input id="latInput" type="text" inputmode="decimal" placeholder="-3.731700"></div>
+          <div><label for="lngInput">Longitude</label><input id="lngInput" type="text" inputmode="decimal" placeholder="-38.526700"></div>
+        </div>
+        <button id="btnUsarLatLng" class="button button-success button-wide" type="button">Desenhar validador</button>
+      </section>
+
+      <section class="control-card" aria-labelledby="titulo-sonda">
+        <div class="card-heading"><span class="step-number step-purple">3</span><div><h2 id="titulo-sonda">Sonda — Controle por mouse</h2><p>Mova o cursor sobre o mapa; botão direito fixa a posição.</p></div></div>
+        <div class="inline-controls">
+          <div class="sonda-radius"><label for="raioSonda">Raio da sonda (m)</label><input id="raioSonda" type="number" min="0" step="1" value="50"></div>
+          <button id="toggleSonda" class="button button-primary" type="button">Ativar Sonda</button>
+        </div>
+        <div class="sonda-coordinates">
+          <div><span>Latitude</span><strong id="sondaLat">Desativada</strong></div>
+          <div><span>Longitude</span><strong id="sondaLng">Desativada</strong></div>
+        </div>
+      </section>
+    </main>
+
+    <section class="map-section" aria-label="Mapa de postos e raios">
+      <div class="map-toolbar"><div><h2>Mapa de localização</h2><p>Os postos GIST e os pontos manuais podem ser visualizados juntos.</p></div><span class="map-hint">Toque no mapa para selecionar coordenadas</span></div>
+      <div class="map-frame">
+        <div id="map" aria-label="Mapa interativo"></div>
+        <aside class="map-overlay" aria-label="Legenda e dados do ponto">
+          <div class="overlay-block">
+            <h3>Legenda dos raios</h3>
+            <div class="legend-row"><span class="legend-dot dot-api"></span>Raio API (GIST)</div>
+            <div class="legend-row"><span class="legend-dot dot-entry"></span>Raio de entrada</div>
+            <div class="legend-row"><span class="legend-dot dot-exit"></span>Raio de saída</div>
+            <div class="legend-row"><span class="legend-dot dot-probe"></span>Raio da sonda fixa</div>
+          </div>
+          <div class="overlay-block selected-point">
+            <h3>Posto / coordenada selecionada</h3>
+            <strong id="nomePosto">Nenhum posto selecionado</strong>
+            <p id="coordPosto">Lat: — | Lng: —</p>
+            <p id="raioPosto">API: 0 m | Entrada: 100 m | Saída: 200 m</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <footer class="page-footer"><span>Consulta de postos e visualização de raios</span><span>Dados do posto dependem da disponibilidade da API.</span></footer>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="./script.js?v=3"></script>
 </body>
 </html>
