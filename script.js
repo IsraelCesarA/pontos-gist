@@ -735,4 +735,4 @@ map.on('contextmenu', e => {
         iconAnchor: [10, 10]
     });
 
-    fixedSondaMarker = L.m
+    fixedSondaMarker = L.m 
